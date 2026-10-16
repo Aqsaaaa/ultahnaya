@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Session — Indie Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-cream: #F4EFE6;
+      --ink-dark: #2C302E;
+      --mustard: #D99B26;
+      --olive: #5B7065;
+      --rust: #C85A32;
+    }
+    body {
+      background-color: var(--bg-cream);
+      color: var(--ink-dark);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .font-mono-indie {
+      font-family: 'Courier Prime', monospace;
+    }
+    .indie-card {
+      background-color: #FAF7F2;
+      border: 2px solid var(--ink-dark);
+      box-shadow: 5px 5px 0px var(--ink-dark);
+      transition: all 0.2s ease;
+    }
+    .indie-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px var(--ink-dark);
+    }
+    .indie-btn {
+      border: 2px solid var(--ink-dark);
+      box-shadow: 3px 3px 0px var(--ink-dark);
+      transition: all 0.15s ease;
+    }
+    .indie-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--ink-dark);
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .vinyl-spin {
+      animation: spinSlow 8s linear infinite;
+      animation-play-state: paused;
+    }
+    .vinyl-spin.playing {
+      animation-play-state: running;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative selection:bg-[#D99B26] selection:text-white">
+
+  <!-- AUDIO ELEMENT (Pastikan file MP3 ada di folder yang sama) -->
+  <audio id="bg-music" loop>
+    <source src="Selamat%20Ulang%20Tahun%20%5BJamrud%5D.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- SPLASH SCREEN (Gatekeeper untuk Nyalakan Lagu Slank) -->
+  <div id="splash" class="fixed inset-0 z-40 bg-[#2C302E] text-[#F4EFE6] flex flex-col items-center justify-center p-6 transition-transform duration-700 ease-in-out">
+    <div class="max-w-md w-full border-2 border-[#F4EFE6] p-8 text-center bg-[#2C302E]">
+      <span class="text-xs font-mono-indie tracking-widest uppercase bg-[#5B7065] text-white px-2 py-1 font-bold">
+        ✓ Captcha Terverifikasi
+      </span>
+      <h1 class="text-3xl font-bold mt-4 mb-2 font-mono-indie">SIAP MEMUTAR KASET?</h1>
+      <p class="text-sm text-gray-300 mb-8 font-mono-indie">
+        Visual: Murphy Radio Vibe <br>
+        Audio: Slank - Selamat Ulang Tahun
+      </p>
+      <button onclick="startExperience()" class="indie-btn bg-[#D99B26] text-[#2C302E] font-bold font-mono-indie px-6 py-3 w-full uppercase tracking-wider hover:bg-[#e5a935]">
+        ▶ Putar Lagu & Masuk
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-4xl mx-auto px-6 py-12 space-y-16">
+
+    <!-- HEADER -->
+    <header class="border-b-2 border-[#2C302E] pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <p class="font-mono-indie text-sm uppercase tracking-widest text-[#5B7065] font-bold">
+            // Sesi Ulang Tahun Spesial
+          </p>
+          <a href="index.html" class="font-mono-indie text-xs underline text-gray-500 hover:text-[#C85A32]">[Logout]</a>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold tracking-tight mt-1">
+          SELAMAT ULANG TAHUN, <span id="display-name" class="text-[#C85A32] underline decoration-wavy">TEMAN</span>!
+        </h1>
+      </div>
+      <div class="font-mono-indie text-xs bg-[#2C302E] text-[#F4EFE6] px-3 py-1.5">
+        TUNING: FACGCE | POTLOT X SAMARINDA
+      </div>
+    </header>
+
+    <!-- HERO: VINYL PLAYER & QUOTE -->
+    <section class="grid md:grid-cols-2 gap-8 items-center">
+      <!-- Vinyl Artwork -->
+      <div class="indie-card p-6 flex flex-col items-center justify-center relative overflow-hidden bg-[#5B7065] text-[#F4EFE6]">
+        <div id="vinyl" class="w-48 h-48 rounded-full bg-[#1a1c1b] border-4 border-[#F4EFE6] flex items-center justify-center shadow-xl vinyl-spin relative">
+          <div class="w-36 h-36 rounded-full border border-gray-700 flex items-center justify-center">
+            <div class="w-24 h-24 rounded-full border border-gray-700 flex items-center justify-center">
+              <div class="w-16 h-16 rounded-full bg-[#D99B26] text-[#2C302E] flex flex-col items-center justify-center text-[10px] font-mono-indie font-bold text-center p-1">
+                <span>⌂</span>
+                <span>SIDE A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player Controls -->
+        <div class="mt-6 w-full flex items-center justify-between bg-[#FAF7F2] text-[#2C302E] p-3 border-2 border-[#2C302E]">
+          <div class="truncate pr-2">
+            <p class="text-xs font-mono-indie font-bold uppercase">Now Playing:</p>
+            <p class="text-sm font-bold truncate">Slank - Selamat Ulang Tahun</p>
+          </div>
+          <button id="play-btn" onclick="toggleMusic()" class="indie-btn bg-[#D99B26] px-4 py-1.5 font-mono-indie text-xs font-bold uppercase shrink-0">
+            Pause
+          </button>
+        </div>
+      </div>
+
+      <!-- Kutipan Lirik & Vibes -->
+      <div class="space-y-4">
+        <div class="inline-block bg-[#D99B26] border-2 border-[#2C302E] px-3 py-1 font-mono-indie text-xs font-bold">
+          TRACK 01 // THE ANTHEM
+        </div>
+        <h2 class="text-2xl font-bold font-mono-indie">Riff Gitar Rumahan & Doa yang Jujur</h2>
+        <blockquote class="indie-card p-5 font-mono-indie text-sm italic leading-relaxed bg-[#FAF7F2]">
+          "Selamat ulang tahun kami ucapkan<br>
+          Selamat panjang umur kita kan doakan<br>
+          Selamat sejahtera sehat sentosa<br>
+          Selamat panjang umur dan bahagia"
+          <footer class="mt-2 not-italic font-bold text-xs text-[#C85A32]">— Slank</footer>
+        </blockquote>
+        <p class="text-sm leading-relaxed text-gray-700">
+          Seperti ketukan ganjil di lagu-lagu <em>Murphy Radio</em> yang selalu menemukan jalan pulang ke harmoni yang hangat, semoga tahun barumu ini penuh dengan kejutan seru dan ketenangan di saat yang tepat.
+        </p>
+      </div>
+    </section>
+
+    <!-- TRACKLIST OF YOUR LIFE (GALERI MEMORI) -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b-2 border-[#2C302E] pb-2">
+        <h2 class="text-2xl font-bold font-mono-indie uppercase">Album Tracklist // Memori</h2>
+        <span class="font-mono-indie text-xs">LP — 3 TRACKS</span>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="indie-card p-4">
+          <div class="aspect-square bg-[#D99B26]/20 border-2 border-[#2C302E] mb-4 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Memori 1" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-300">
+          </div>
+          <span class="font-mono-indie text-xs text-[#5B7065] font-bold">01 // INTRO (02:45)</span>
+          <h3 class="font-bold text-lg mt-1">Masa-Masa Polos</h3>
+          <p class="text-xs text-gray-600 mt-1">Dari zaman belum kenal skena musik sampai sekarang jadi orang paling keren di tongkrongan.</p>
+        </div>
+
+        <div class="indie-card p-4">
+          <div class="aspect-square bg-[#5B7065]/20 border-2 border-[#2C302E] mb-4 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&q=80" alt="Memori 2" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-300">
+          </div>
+          <span class="font-mono-indie text-xs text-[#C85A32] font-bold">02 // NAFTALENA (04:12)</span>
+          <h3 class="font-bold text-lg mt-1">Kopi & Obrolan Malam</h3>
+          <p class="text-xs text-gray-600 mt-1">Terima kasih sudah selalu jadi teman diskusi dan pendengar yang baik di segala cuaca.</p>
+        </div>
+
+        <div class="indie-card p-4">
+          <div class="aspect-square bg-[#C85A32]/20 border-2 border-[#2C302E] mb-4 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=500&q=80" alt="Memori 3" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-300">
+          </div>
+          <span class="font-mono-indie text-xs text-[#D99B26] font-bold">03 // OUTRO (ONGOING)</span>
+          <h3 class="font-bold text-lg mt-1">Menuju Album Berikutnya</h3>
+          <p class="text-xs text-gray-600 mt-1">Semoga semua rencana, karya, dan impianmu di usia baru ini berjalan lancar tanpa distorsi!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LINER NOTES -->
+    <section class="indie-card p-6 md:p-8 bg-[#FAF7F2]">
+      <div class="flex justify-between items-center border-b-2 border-dashed border-[#2C302E] pb-4 mb-4">
+        <span class="font-mono-indie font-bold text-sm uppercase">Liner Notes // Pesan Personal</span>
+        <button onclick="shootConfetti()" class="indie-btn bg-[#C85A32] text-white font-mono-indie text-xs px-3 py-1 font-bold">
+          🎉 Rayakan Lagi!
+        </button>
+      </div>
+      <div class="font-mono-indie text-sm space-y-3 leading-relaxed">
+        <p>Halo,</p>
+        <p>
+          Selamat mengulang hari lahir! Setelah berhasil melewati ujian Captcha mencari wajah sendiri tadi, selamat menikmati halaman kecil bernuansa <strong>Murphy Radio</strong> yang diiringi lagu <strong>Slank</strong> ini.
+        </p>
+        <p>
+          Semoga sehat selalu, rezeki lancar, dan tetap menjadi diri sendiri yang hangat bagi orang-orang di sekitarmu. Panjang umur hal-hal baik!
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Ambil nama dari halaman Login (index.html)
+    const savedName = localStorage.getItem('bday_username');
+    if (savedName) {
+      document.getElementById('display-name').innerText = savedName.toUpperCase();
+    }
+
+    const audio = document.getElementById('bg-music');
+    const vinyl = document.getElementById('vinyl');
+    const playBtn = document.getElementById('play-btn');
+    const splash = document.getElementById('splash');
+    let isPlaying = false;
+
+    function startExperience() {
+      splash.style.transform = 'translateY(-100%)';
+      audio.play().then(() => {
+        isPlaying = true;
+        vinyl.classList.add('playing');
+        playBtn.innerText = 'Pause';
+      }).catch((err) => {
+        console.log("Pastikan file MP3 ada di folder yang sama:", err);
+        playBtn.innerText = 'Play';
+      });
+      setTimeout(shootConfetti, 400);
+    }
+
+    function toggleMusic() {
+      if (isPlaying) {
+        audio.pause();
+        vinyl.classList.remove('playing');
+        playBtn.innerText = 'Play';
+      } else {
+        audio.play();
+        vinyl.classList.add('playing');
+        playBtn.innerText = 'Pause';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function shootConfetti() {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#D99B26', '#5B7065', '#C85A32', '#2C302E']
+      });
+    }
+  </script>
+</body>
+</html>

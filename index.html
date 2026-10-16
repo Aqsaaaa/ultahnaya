@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backstage Access — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-cream: #F4EFE6;
+      --ink-dark: #2C302E;
+      --mustard: #D99B26;
+      --olive: #5B7065;
+      --rust: #C85A32;
+    }
+    body {
+      background-color: var(--bg-cream);
+      color: var(--ink-dark);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .font-mono-indie {
+      font-family: 'Courier Prime', monospace;
+    }
+    .font-roboto {
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .indie-card {
+      background-color: #FAF7F2;
+      border: 2px solid var(--ink-dark);
+      box-shadow: 6px 6px 0px var(--ink-dark);
+    }
+    .indie-input {
+      background-color: #FFFFFF;
+      border: 2px solid var(--ink-dark);
+      box-shadow: 2px 2px 0px var(--ink-dark);
+      outline: none;
+    }
+    .indie-input:focus {
+      background-color: #FFFDF9;
+      box-shadow: 4px 4px 0px var(--mustard);
+    }
+    .indie-btn {
+      border: 2px solid var(--ink-dark);
+      box-shadow: 3px 3px 0px var(--ink-dark);
+      transition: all 0.15s ease;
+    }
+    .indie-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--ink-dark);
+    }
+
+    /* ==========================================
+       GAYA KONVENSIONAL GOOGLE reCAPTCHA
+       ========================================== */
+    .recaptcha-box {
+      background-color: #f9f9f9;
+      border: 1px solid #d3d3d3;
+      border-radius: 3px;
+      box-shadow: 0 0 4px 1px rgba(0,0,0,0.08);
+      height: 74px;
+      padding: 0 12px;
+      font-family: 'Roboto', Arial, sans-serif;
+      user-select: none;
+    }
+    .recaptcha-checkbox {
+      width: 28px;
+      height: 28px;
+      background-color: #fff;
+      border: 2px solid #c1c1c1;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .recaptcha-checkbox:hover {
+      border-color: #b2b2b2;
+    }
+    /* Animasi Spinner Biru reCAPTCHA */
+    .recaptcha-spinner {
+      width: 26px;
+      height: 26px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4285f4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Popup Modal reCAPTCHA */
+    .rc-Popup {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      width: 340px;
+      padding: 6px;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .rc-header {
+      background-color: #1a73e8;
+      color: #ffffff;
+      padding: 16px;
+      margin-bottom: 6px;
+    }
+    .rc-tile {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      background: #eee;
+    }
+    .rc-tile img {
+      transition: transform 0.15s ease;
+    }
+    .rc-tile.selected img {
+      transform: scale(0.8);
+    }
+    .rc-check {
+      display: none;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      background-color: #1a73e8;
+      color: #fff;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .rc-tile.selected .rc-check {
+      display: flex;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 selection:bg-[#D99B26]">
+
+  <!-- CARD LOGIN UTAMA (Tema Murphy Radio) -->
+  <div class="indie-card max-w-md w-full p-6 md:p-8 relative">
+    <div class="flex justify-between items-center border-b-2 border-[#2C302E] pb-3 mb-6">
+      <span class="font-mono-indie text-xs font-bold uppercase bg-[#5B7065] text-white px-2 py-1">
+        ⌂ MURPHY RADIO VIBES
+      </span>
+      <span class="font-mono-indie text-xs font-bold">GATE 01 // LOGIN</span>
+    </div>
+
+    <h1 class="text-2xl md:text-3xl font-bold font-mono-indie mb-1">BACKSTAGE PASS</h1>
+    <p class="text-xs text-gray-600 font-mono-indie mb-6">
+      Khusus untuk yang berulang tahun hari ini. Masukkan identitasmu & selesaikan reCAPTCHA!
+    </p>
+
+    <form id="login-form" onsubmit="handleFinalSubmit(event)" class="space-y-4">
+      <div>
+        <label class="block font-mono-indie text-xs font-bold uppercase mb-1">Nama Panggilan</label>
+        <input type="text" id="username" required placeholder="Ketik namamu di sini..." 
+               class="indie-input w-full px-3 py-2.5 text-sm font-mono-indie">
+      </div>
+
+      <div>
+        <label class="block font-mono-indie text-xs font-bold uppercase mb-1">Tanggal Lahir / Passcode</label>
+        <input type="password" id="passcode" required placeholder="Contoh: 1708" 
+               class="indie-input w-full px-3 py-2.5 text-sm font-mono-indie">
+      </div>
+
+      <!-- ==============================================================
+           WIDGET KONVENSIONAL GOOGLE reCAPTCHA ("I'm not a robot")
+           ============================================================== -->
+      <div class="pt-1">
+        <div class="recaptcha-box flex items-center justify-between max-w-[304px]">
+          <div class="flex items-center gap-3">
+            <!-- Area Kotak / Spinner / Centang Hijau -->
+            <div id="rc-box-container" onclick="triggerRecaptcha()" class="w-7 h-7 flex items-center justify-center">
+              <div id="rc-unchecked" class="recaptcha-checkbox"></div>
+              <div id="rc-loading" class="recaptcha-spinner hidden"></div>
+              <!-- Centang Hijau saat Lulus -->
+              <svg id="rc-verified" class="w-7 h-7 text-[#009e55] hidden" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <span onclick="triggerRecaptcha()" class="text-[14px] text-[#282828] font-normal cursor-pointer">
+              I'm not a robot
+            </span>
+          </div>
+
+          <!-- Logo Kanan reCAPTCHA -->
+          <div class="flex flex-col items-center justify-center text-center">
+            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" class="w-8 h-8 opacity-90">
+            <span class="text-[10px] text-[#555] leading-tight mt-0.5 font-medium">reCAPTCHA</span>
+            <span class="text-[8px] text-[#555] leading-tight">Privacy - Terms</span>
+          </div>
+        </div>
+        <p id="rc-warn" class="text-[11px] text-[#d93025] font-roboto mt-1 hidden">
+          Silakan selesaikan verifikasi reCAPTCHA terlebih dahulu.
+        </p>
+      </div>
+
+      <!-- Tombol Submit Utama -->
+      <button type="submit" id="submit-btn" class="indie-btn w-full bg-[#D99B26] text-[#2C302E] font-mono-indie font-bold py-3 uppercase tracking-wider mt-4 hover:bg-[#e5a935]">
+        Masuk ke Backstage →
+      </button>
+    </form>
+  </div>
+
+  <!-- ==============================================================
+       POP-UP MODAL TANTANGAN GAMBAR reCAPTCHA KONVENSIONAL
+       ============================================================== -->
+  <div id="captcha-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="rc-Popup">
+      
+      <!-- Header Biru Google reCAPTCHA -->
+      <div class="rc-header">
+        <p class="text-[13px] leading-tight opacity-95">Pilih semua kotak dengan</p>
+        <h2 class="text-[22px] font-bold leading-tight mt-0.5">
+          orang yang ulang tahun hari ini
+        </h2>
+        <p class="text-[13px] leading-tight mt-1 opacity-90">
+          Jika tidak ada yang tersisa, klik Verifikasi
+        </p>
+      </div>
+
+      <!-- Grid Gambar 3x3 -->
+      <div id="captcha-grid" class="grid grid-cols-3 gap-[4px] bg-white">
+        <!-- Di-render lewat JavaScript -->
+      </div>
+
+      <!-- Pesan Error ala Google -->
+      <div id="captcha-error" class="text-[#d93025] text-[12px] text-center py-2 hidden">
+        Silakan pilih semua gambar yang cocok.
+      </div>
+
+      <!-- Footer Ikon & Tombol VERIFY -->
+      <div class="flex items-center justify-between border-t border-gray-200 pt-2.5 mt-1.5 px-1">
+        <!-- Ikon Kiri (Reload, Audio, Info) -->
+        <div class="flex items-center gap-4 text-gray-500">
+          <!-- Tombol Reload -->
+          <button type="button" onclick="renderCaptchaGrid()" title="Ambil tantangan baru" class="hover:text-gray-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </button>
+          <!-- Ikon Audio (Dekoratif) -->
+          <button type="button" onclick="alert('Hint Audio: Pilih 3 foto wajah orang yang hari ini tambah tua!')" title="Petunjuk Audio" class="hover:text-gray-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4m-4 0h8"></path>
+            </svg>
+          </button>
+          <!-- Ikon Info -->
+          <button type="button" onclick="alert('Pilih tepat 3 foto temanmu yang berulang tahun!')" title="Bantuan" class="hover:text-gray-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Tombol Biru VERIFY -->
+        <button type="button" onclick="verifyCaptcha()" class="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium text-[14px] px-6 py-2 rounded-[2px] uppercase tracking-wide transition">
+          Verify
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // DAFTAR FOTO CAPTCHA (GANTI URL isTarget: true DENGAN FOTO TEMANMU!)
+    // =========================================================================
+    const captchaImages = [
+      // 3 FOTO DIA (isTarget: true) -> Ganti src dengan "target-1.jpg", "target-2.jpg", "target-3.jpg"
+      { id: 1, src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80", isTarget: true },
+      { id: 2, src: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80", isTarget: true },
+      { id: 3, src: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80", isTarget: true },
+
+      // 6 FOTO PENGECOH / DECOY (isTarget: false) -> Kucing, Gitar, Kopi, Rumah, Kaset
+      { id: 4, src: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300&q=80", isTarget: false },
+      { id: 5, src: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80", isTarget: false },
+      { id: 6, src: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80", isTarget: false },
+      { id: 7, src: "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=300&q=80", isTarget: false },
+      { id: 8, src: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=300&q=80", isTarget: false },
+      { id: 9, src: "https://images.unsplash.com/photo-1461784121038-f088ca1e7714?auto=format&fit=crop&w=300&q=80", isTarget: false }
+    ];
+
+    let selectedIds = new Set();
+    let isCaptchaVerified = false;
+
+    // Saat kotak "I'm not a robot" diklik
+    function triggerRecaptcha() {
+      if (isCaptchaVerified) return; // Kalau sudah centang hijau, tidak perlu buka lagi
+
+      document.getElementById('rc-warn').classList.add('hidden');
+      document.getElementById('rc-unchecked').classList.add('hidden');
+      document.getElementById('rc-loading').classList.remove('hidden');
+
+      // Efek loading spinner selama 500ms seperti Google reCAPTCHA asli
+      setTimeout(() => {
+        renderCaptchaGrid();
+        const modal = document.getElementById('captcha-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }, 500);
+    }
+
+    function renderCaptchaGrid() {
+      selectedIds.clear();
+      document.getElementById('captcha-error').classList.add('hidden');
+
+      const grid = document.getElementById('captcha-grid');
+      grid.innerHTML = '';
+
+      // Acak urutan 9 foto
+      const shuffled = [...captchaImages].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(item => {
+        const tile = document.createElement('div');
+        tile.className = 'rc-tile aspect-square';
+        tile.onclick = () => toggleTile(tile, item.id);
+
+        tile.innerHTML = `
+          <img src="${item.src}" alt="reCAPTCHA tile" class="w-full h-full object-cover">
+          <div class="rc-check">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        `;
+        grid.appendChild(tile);
+      });
+    }
+
+    function toggleTile(tileElement, id) {
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+        tileElement.classList.remove('selected');
+      } else {
+        selectedIds.add(id);
+        tileElement.classList.add('selected');
+      }
+    }
+
+    function verifyCaptcha() {
+      const targetIds = captchaImages.filter(img => img.isTarget).map(img => img.id);
+      const errBox = document.getElementById('captcha-error');
+
+      const isCorrect = selectedIds.size === targetIds.length && 
+                        targetIds.every(id => selectedIds.has(id));
+
+      if (isCorrect) {
+        isCaptchaVerified = true;
+        // Tutup modal tantangan gambar
+        const modal = document.getElementById('captcha-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Ubah spinner menjadi Centang Hijau reCAPTCHA
+        document.getElementById('rc-loading').classList.add('hidden');
+        document.getElementById('rc-verified').classList.remove('hidden');
+      } else {
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    // Saat tombol "Masuk ke Backstage" diklik
+    function handleFinalSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+
+      if (!isCaptchaVerified) {
+        document.getElementById('rc-warn').classList.remove('hidden');
+        return;
+      }
+
+      // Simpan nama panggilan untuk ditampilkan di halaman kedua (birthday.html)
+      localStorage.setItem('bday_username', username);
+      window.location.href = "birthday.html";
+    }
+  </script>
+</body>
+</html>
