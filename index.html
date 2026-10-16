@@ -156,12 +156,18 @@
         <label class="block font-mono-indie text-xs font-bold uppercase mb-1">Nama Panggilan</label>
         <input type="text" id="username" required placeholder="Ketik namamu di sini..." 
                class="indie-input w-full px-3 py-2.5 text-sm font-mono-indie">
+        <p id="name-warn" class="text-[11px] text-[#d93025] font-roboto mt-1 hidden">
+          Nama panggilan salah. Coba ingat-ingat lagi siapa yang ulang tahun hari ini.
+        </p>
       </div>
 
       <div>
         <label class="block font-mono-indie text-xs font-bold uppercase mb-1">Tanggal Lahir / Passcode</label>
-        <input type="password" id="passcode" required placeholder="Contoh: 1708" 
+        <input type="password" id="passcode" required placeholder="Ketik tanggal lahirmu..." 
                class="indie-input w-full px-3 py-2.5 text-sm font-mono-indie">
+        <p id="pass-warn" class="text-[11px] text-[#d93025] font-roboto mt-1 hidden">
+          Passcode salah. Formatnya tanggal lahir, lho.
+        </p>
       </div>
 
       <!-- ==============================================================
@@ -367,11 +373,36 @@
     function handleFinalSubmit(e) {
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
+      const passcode = document.getElementById('passcode').value.trim();
+
+      const nameWarn = document.getElementById('name-warn');
+      const passWarn = document.getElementById('pass-warn');
+
+      // Sembunyikan semua pesan error dulu
+      nameWarn.classList.add('hidden');
+      passWarn.classList.add('hidden');
+      document.getElementById('rc-warn').classList.add('hidden');
 
       if (!isCaptchaVerified) {
         document.getElementById('rc-warn').classList.remove('hidden');
         return;
       }
+
+      let valid = true;
+
+      // Nama panggilan harus "NAYA"
+      if (username.toUpperCase() !== 'NAYA') {
+        nameWarn.classList.remove('hidden');
+        valid = false;
+      }
+
+      // Passcode harus tanggal lahir: 16102007
+      if (passcode !== '16102007') {
+        passWarn.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (!valid) return;
 
       // Simpan nama panggilan untuk ditampilkan di halaman kedua (birthday.html)
       localStorage.setItem('bday_username', username);
